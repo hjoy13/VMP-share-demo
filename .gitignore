@@ -23,3 +23,9 @@ local.properties
 
 # Confidential assignment/materials
 *.pdf
+
+# Private notes, never commit
+project_plan.md
+current_status.md
+CLAUDE.md
+*.pdf
