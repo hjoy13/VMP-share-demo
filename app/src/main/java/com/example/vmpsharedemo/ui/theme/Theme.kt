@@ -1,16 +1,10 @@
 package com.example.vmpsharedemo.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 
-private val DarkColorScheme = darkColorScheme(
-    primary = VmpPurple,
-    secondary = VmpPurpleDark
-)
-
+// Demo is light only: VMP's screens are light, so no dark scheme.
 private val LightColorScheme = lightColorScheme(
     primary = VmpPurple,
     secondary = VmpPurpleDark,
@@ -22,18 +16,9 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun VMPShareDemoTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit
-) {
-    val colorScheme = if (darkTheme) {
-        DarkColorScheme
-    } else {
-        LightColorScheme
-    }
-
+fun VMPShareDemoTheme(content: @Composable () -> Unit) {
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = LightColorScheme,
         typography = Typography,
         content = content
     )

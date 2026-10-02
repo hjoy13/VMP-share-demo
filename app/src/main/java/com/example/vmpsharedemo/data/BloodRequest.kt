@@ -48,3 +48,15 @@ val sampleBloodRequests = listOf(
         postedTime = "1 hr ago"
     )
 )
+
+// The request pre-filled in the "Ask for blood" form (Step 7). Fictional data.
+val newBloodRequest = BloodRequest(
+    id = "blood_004",
+    patientName = "Sadia Rahman",
+    bloodGroup = "A-",
+    hospital = "Riverside Hospital",
+    location = "Sylhet",
+    unitsNeeded = 2,
+    urgency = Urgency.URGENT,
+    postedTime = "Just now"
+)

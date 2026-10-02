@@ -27,6 +27,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.vmpsharedemo.ui.theme.VmpBorder
+import com.example.vmpsharedemo.ui.theme.VmpCrimson
 import com.example.vmpsharedemo.data.BloodRequest
 import com.example.vmpsharedemo.share.ShareHelper
 
@@ -80,14 +82,14 @@ fun ShareSheet(request: BloodRequest, onDismiss: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(14.dp))
-                    .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(14.dp))
+                    .border(1.dp, VmpBorder, RoundedCornerShape(14.dp))
                     .padding(14.dp)
             ) {
                 Text(
                     text = "${request.bloodGroup} blood needed",
                     fontSize = 17.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFFB51E4A)
+                    color = VmpCrimson
                 )
                 Text(
                     text = "${request.hospital}, ${request.location}",

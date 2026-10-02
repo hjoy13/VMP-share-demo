@@ -2,6 +2,7 @@ package com.example.vmpsharedemo.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,13 +32,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.vmpsharedemo.ui.theme.VmpGreenBg
+import com.example.vmpsharedemo.ui.theme.VmpBorder
+import com.example.vmpsharedemo.ui.theme.VmpCrimson
+import com.example.vmpsharedemo.ui.theme.VmpPurple
 import com.example.vmpsharedemo.data.BloodRequest
 import com.example.vmpsharedemo.data.Urgency
 import com.example.vmpsharedemo.data.sampleBloodRequests
 
 @Composable
-fun RequestsScreen() {
+fun RequestsScreen(onAskForBlood: () -> Unit) {
     var sharingRequest by remember { mutableStateOf<BloodRequest?>(null) }
+    var showMyRequests by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -59,7 +65,7 @@ fun RequestsScreen() {
             Text(
                 text = "♥",
                 fontSize = 28.sp,
-                color = Color(0xFFB51E4A)
+                color = VmpCrimson
             )
 
             Text(
@@ -84,66 +90,62 @@ fun RequestsScreen() {
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(
-                text = "Requests",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.White,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(Color(0xFF6C4CF5))
-                    .padding(
-                        horizontal = 24.dp,
-                        vertical = 10.dp
-                    )
-            )
-
-            Text(
-                text = "My requests",
-                fontSize = 18.sp,
-                color = Color(0xFF555555),
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 28.dp)
-            )
-
-            Text(
-                text = "Donor",
-                fontSize = 18.sp,
-                color = Color(0xFF555555)
-            )
+            TabLabel("Requests", selected = !showMyRequests) { showMyRequests = false }
+            TabLabel("My requests", selected = showMyRequests) { showMyRequests = true }
+            TabLabel("Donor", selected = false) { /* demo: does nothing */ }
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(14.dp))
-                .background(Color(0xFFEAF6EF))
-                .padding(
-                    horizontal = 16.dp,
-                    vertical = 14.dp
-                )
-        ) {
+        if (showMyRequests) {
+            // "My requests" tab: the way into the Ask for blood form (Step 7)
             Text(
-                text = "✓  You can donate now",
-                fontSize = 17.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF1E1E1E)
+                text = "You have no active requests.",
+                fontSize = 16.sp,
+                color = Color(0xFF666666)
             )
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(sampleBloodRequests) { request ->
-                RequestCard(request, onShare = { sharingRequest = request })
+            Button(
+                onClick = onAskForBlood,
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = VmpPurple),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = "Ask for blood", fontSize = 16.sp)
+            }
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(VmpGreenBg)
+                    .padding(
+                        horizontal = 16.dp,
+                        vertical = 14.dp
+                    )
+            ) {
+                Text(
+                    text = "✓  You can donate now",
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF1E1E1E)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(sampleBloodRequests) { request ->
+                    RequestCard(request, onShare = { sharingRequest = request })
+                }
             }
         }
     }
@@ -154,13 +156,29 @@ fun RequestsScreen() {
     }
 }
 
+// One tab: purple pill when selected, plain text otherwise
+@Composable
+private fun TabLabel(text: String, selected: Boolean, onClick: () -> Unit) {
+    Text(
+        text = text,
+        fontSize = 18.sp,
+        fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+        color = if (selected) Color.White else Color(0xFF555555),
+        modifier = Modifier
+            .clip(RoundedCornerShape(10.dp))
+            .background(if (selected) VmpPurple else Color.Transparent)
+            .clickable { onClick() }
+            .padding(horizontal = 16.dp, vertical = 10.dp)
+    )
+}
+
 @Composable
 private fun UrgencyChip(urgency: Urgency) {
     // label, text color, background color for each urgency level
     val (label, textColor, bgColor) = when (urgency) {
-        Urgency.URGENT -> Triple("Urgent", Color(0xFFB51E4A), Color(0xFFFCE4EC))
+        Urgency.URGENT -> Triple("Urgent", VmpCrimson, Color(0xFFFCE4EC))
         Urgency.NEEDED_TODAY -> Triple("Needed today", Color(0xFFB45F06), Color(0xFFFFF0DC))
-        Urgency.NORMAL -> Triple("Normal", Color(0xFF2E7D32), Color(0xFFEAF6EF))
+        Urgency.NORMAL -> Triple("Normal", Color(0xFF2E7D32), VmpGreenBg)
     }
     Text(
         text = label,
@@ -180,7 +198,7 @@ private fun RequestCard(request: BloodRequest, onShare: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
-            .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(14.dp))
+            .border(1.dp, VmpBorder, RoundedCornerShape(14.dp))
             .background(Color.White)
             .padding(16.dp)
     ) {
@@ -189,7 +207,7 @@ private fun RequestCard(request: BloodRequest, onShare: () -> Unit) {
                 text = request.bloodGroup,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFFB51E4A)
+                color = VmpCrimson
             )
             Text(
                 text = "  ${request.patientName}",
@@ -226,7 +244,7 @@ private fun RequestCard(request: BloodRequest, onShare: () -> Unit) {
             Button(
                 onClick = { /* demo: does nothing */ },
                 shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6C4CF5)),
+                colors = ButtonDefaults.buttonColors(containerColor = VmpPurple),
                 modifier = Modifier.weight(1f)
             ) {
                 Text(text = "Offer to donate", fontSize = 15.sp)
@@ -241,7 +259,7 @@ private fun RequestCard(request: BloodRequest, onShare: () -> Unit) {
                 Text(
                     text = "Share",
                     fontSize = 15.sp,
-                    color = Color(0xFF6C4CF5)
+                    color = VmpPurple
                 )
             }
         }
